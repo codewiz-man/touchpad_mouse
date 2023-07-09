@@ -3,6 +3,7 @@
 import asyncio
 from websockets.server import serve
 from pynput.mouse import Button, Controller
+import webview
 
 TOUCHSTART = 0x00
 TOUCHMOVE = 0x01
@@ -68,5 +69,9 @@ async def echo(websocket):
 async def main():
     async with serve(echo, "0.0.0.0", 2023):
         await asyncio.Future()  # run forever
+
+
+webview.create_window('Test', 'assets/index.html')
+webview.start()
 
 asyncio.run(main())
