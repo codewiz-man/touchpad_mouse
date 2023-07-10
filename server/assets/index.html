@@ -1,1 +1,101 @@
-<h1> Smac Server Running... </h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            min-width: 600px; min-height: 600px; font-family: Arial, Helvetica, sans-serif;
+        }
+        .C_container {
+            width: 100vw; height: 100vh; background-color: #f0f0f0; position: relative;
+            color: #323232; overflow-y: auto;      
+        }
+        .C_left {
+            width: 50%; float: left; min-width: 300px;
+        }
+        .C_right {
+            width: 50%; float: left;  min-width: 300px;
+        }
+        input[type=text], input[type=number], input[type=email], input[type=password] {
+            outline: none;
+            border: none;
+            padding: 15px 10px;
+            width: calc(100% - 40px);
+            margin: 5px 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        input[type=text]:disabled, input[type=number]:disabled, input[type=email]:disabled, input[type=password]:disabled { 
+            opacity: 0.5;
+        }
+
+        .C_button, .C_button_large {
+            display: inline-block;
+            width: auto;
+            height: auto;
+            overflow: hidden;
+            color: #fff;
+            background-color: #04AA6D;
+            cursor: pointer;
+            padding: 12px 15px;
+            border-radius: 3px;
+            letter-spacing: .5px;
+            font-size: 90%;
+            margin: 5px;
+            border: none;
+        }
+
+        .C_button_large {
+            width: calc(100% - 20px);
+            text-align: center;
+        }
+
+        .C_button:disabled, .C_button_large:disabled {
+            opacity: .5;
+        }
+        .C_button:hover, .C_button:active, .C_button_large:hover, .C_button_large:active {
+            filter: brightness(1.15);
+        }
+        .C_config-container {
+            width: 75%;
+            height: 100%;
+            margin: auto;
+            margin-top: 100px;
+            position: relative;
+        }
+        .C_config-head {
+            width: 100%;
+            font-size: 20px; font-weight: bold; text-align: center;
+            padding: 30px 0;
+        }
+    </style>
+    <title>Touchpad Server</title>
+</head>
+<body>
+
+<div class="C_container">
+    <div class="C_left"> 
+        <div class="C_config-container">
+            <div class="C_config-head">
+                Settings
+            </div>
+            <div>
+                <input type="text" placeholder="Server Address" id="id_server_address" disabled>
+            </div>
+            <div>
+                <input type="text" placeholder="Server Port" value="2023">
+            </div>
+            <button class="C_button_large" id="id_save_setting"> save </button>
+        </div>
+    </div>
+    <div class="C_right">
+        <div id="id_qrcode"> 
+
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    
+</script>
+</html>

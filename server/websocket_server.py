@@ -4,7 +4,11 @@ import asyncio
 from websockets.server import serve
 from pynput.mouse import Button, Controller
 import webview
+import threading
 
+
+SERVER_IP = ""
+SERVER_PORT = 2023
 TOUCHSTART = 0x00
 TOUCHMOVE = 0x01
 TOUCHEND = 0x02
@@ -65,13 +69,54 @@ async def echo(websocket):
             sc = int(msg[1])
             mouse.scroll(0,sc)
 
+def get_local_ip():
+    try:
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        SERVER_IP = s.getsockname()[0]
+        print(SERVER_IP)
+        s.close()
+    except Exception as e:
+        print("Exception while getting IP: {}".format(e))
 
-async def main():
-    async with serve(echo, "0.0.0.0", 2023):
+async def _start_server():
+    print('starting webserver at {}:{}'.format(SERVER_IP, SERVER_PORT))
+    async with serve(echo, "0.0.0.0", SERVER_PORT):
         await asyncio.Future()  # run forever
 
 
-webview.create_window('Test', 'assets/index.html')
-webview.start()
+def start_server():
+    asyncio.run(_start_server())
 
-asyncio.run(main())
+
+def open_confirmation_dialog(window):
+    result = window.create_confirmation_dialog('Question', 'Are you ok with this?')
+    if result:
+        print('User clicked OK')
+    else:
+        print('User clicked Cancel')
+
+class Api:
+    def __init__(self):
+        self.cancel_heavy_stuff_flag = False
+
+    def get_server_ip(self):
+        response = {
+            'IP': 'Hello from Python {0}'.format(SERVER_IP)
+        }
+        return response
+
+
+def main():
+    get_local_ip()
+
+    th = threading.Thread(target=start_server)
+
+    api = Api()
+    window = webview.create_window('Touchpad Server', 'assets/index.html', confirm_close=False, js_api=api)
+    #webview.start(open_confirmation_dialog, window, debug=False)
+    webview.start()
+
+main()
+
