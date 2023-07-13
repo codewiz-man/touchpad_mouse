@@ -10,16 +10,33 @@
         color: #323232;
         margin: 0; padding: 0;
     }
-    /*@media only screen and (min-width: 600px) {
-        body {
-            background-color: lightblue;
+    .C_main {
+        width: 100%; height: 100%; position: relative;
+    }
+    @media only screen and (min-width: 1080px) {
+        .C_main {
+            width: 70%;
+            margin: auto;
         }
-    }*/
+    }
+    #id_loader {
+        width: 100vw; height: 100vh; background-color: rgba(255, 255,255,0.5); color: #323232;
+        position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 5; display: none;
+    }
+
+    #id_loader-text {
+        text-align: center;
+        margin-top: calc( 50vh - 30px );
+        color: #323232; font-size: 17px;
+    }
     .C_touchpad_container {
-        width: 100vw; height: 100vh; position: relative;
+        width: 100vw; height: 100vh; position: relative; display: none;
     }
     .C_touchpad-header {
         width: 100%; height: 50px; font-weight: bold; text-align: center; line-height: 3rem;
+    }
+    .C_touchpad-header .C_icon_button {
+        float: right;
     }
     .C_touchpad_area {
         width: 100%; height: calc(100% - 150px);
@@ -36,24 +53,133 @@
         width: calc(50% - 5px); height: 100%; position: relative; float: left; background-color: #a0a0a0; border-radius: 20px 20px 0 0;
         margin-left: 2.5px; margin-right: 2.5px;
     }
+    .C_setting_container {
+            width: 100vw; height: 100vh; background-color: #f0f0f0; position: relative;
+            color: #323232; overflow-y: auto;      
+    }
+    .C_config-container {
+        width: 75%;
+        height: calc(100% - 100px);
+        margin: auto;
+        margin-top: 100px;
+        position: relative;
+    }
+    .C_config-head {
+        width: 100%;
+        max-width: 350px;
+        font-size: 20px; font-weight: bold; text-align: center;
+        padding: 30px 0;
+    }
+    input[type=text], input[type=number], input[type=email], input[type=password] {
+        outline: none;
+        border: none;
+        padding: 15px 10px;
+        width: calc(100% - 40px);
+        margin: 5px 5px;
+        border-bottom: 1px solid #e0e0e0;
+        max-width: 350px;
+    }
+
+    input[type=text]:disabled, input[type=number]:disabled, input[type=email]:disabled, input[type=password]:disabled { 
+        opacity: 0.5;
+    }
+
+    .C_button, .C_button_large {
+        display: inline-block;
+        width: auto;
+        height: auto;
+        overflow: hidden;
+        color: #fff;
+        background-color: #04AA6D;
+        cursor: pointer;
+        padding: 12px 15px;
+        border-radius: 3px;
+        letter-spacing: .5px;
+        font-size: 90%;
+        margin: 5px;
+        border: none;
+    }
+
+    .C_button_large {
+        width: calc(100% - 20px);
+        max-width: 350px;
+        text-align: center;
+    }
+
+    .C_button:disabled, .C_button_large:disabled {
+        opacity: .5;
+    }
+    .C_button:hover, .C_button:active, .C_button_large:hover, .C_button_large:active {
+        filter: brightness(1.15);
+    }
+    .C_icon_button {
+        width: 50px; height: 50px; cursor: pointer;
+    }
+    .C_icon_button img {
+        width: 30px; height: 30px; margin-left: 10px; margin-top: 10px;
+    }
+    .C_icon_text_button {
+        width: auto;
+        position: relative;
+        font-size: 15px;
+        font-weight: bold;
+        line-height: 3rem;
+        margin-top: 20px;
+    }
+    .C_icon_text_button div {
+        float: left;
+        width: auto;
+    }
 </style>
 </head>
 <body>
-<div class="C_touchpad_container">
-    <div class="C_touchpad-header"> Mouse Pad </div>
-    <div id="id_touchpad_area" class="C_touchpad_area" ontouchstart="myFunction()">
-        <div class="C_touchpad_scroll" id="id_touchpad_scroll"> </div>
+    <div id="id_loader">
+        <p id="id_loader-text"> </p>
     </div>
-    <div class="C_touchpad_buttons">
-        <div class="C_touchpad-btn" id="id_touchpad_left">
+    <div class="C_main">
+        <div class="C_setting_container" id="id_setting_container">
+            <div class="C_config-container">
+                <div class="C_config-head">
+                Touchpad Connect
+                </div>
+                <div>
+                    <input type="text" placeholder="Server Address" id="id_server_address" >
+                </div>
+                <div>
+                    <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
+                </div>
+                <button class="C_button_large" id="id_save_setting"> save & connect </button> <br>
+                <div class="C_icon_text_button">
+                    <div> Scan and Connect </div>
+                    <div class="C_icon_button" id="id_touchpad_close">
+                        <img src="images/qr_code_scanner.png">
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="C_touchpad_container" id="id_touchpad_container">
+            <div class="C_touchpad-header"> 
+                Mouse Pad 
+                <div class="C_icon_button" id="id_touchpad_close">
+                    <img src="images/close.png">
+                </div>
+            </div>
+            <div id="id_touchpad_area" class="C_touchpad_area" ontouchstart="myFunction()">
+                <div class="C_touchpad_scroll" id="id_touchpad_scroll"> </div>
+            </div>
+            <div class="C_touchpad_buttons">
+                <div class="C_touchpad-btn" id="id_touchpad_left">
+
+                </div>
+                <div class="C_touchpad-btn" id="id_touchpad_right">
+
+                </div>
+            </div>
 
         </div>
-        <div class="C_touchpad-btn" id="id_touchpad_right">
-
-        </div>
     </div>
-
-</div>
 
 <script>
     const TOUCHSTART = 0x00;
@@ -66,38 +192,143 @@
     const SCROLL = 0x07;
     const LEFT_CLICK = 0x08;
     const RIGHT_CLICK = 0x09;
-    let ip = "192.168.0.141"
-    let port  = 2023
-    let socket = new WebSocket("ws://" + ip +":"+ port);
+    let IP = "192.168.0.141"
+    let PORT  = 2023
+    var socket;
     let connected = false;
 
-    socket.onopen = function(e) {
+    function sock_onopen(e) {
         alert("[open] Connection established");
         connected = 1;
         socket.binaryType = "arraybuffer";
         //alert("Sending to server");
         //socket.send("My name is John");
+        hideLoader();
+        gotoTouchpadScreen();
     };
 
-    socket.onmessage = function(event) {
-        alert('[message] Data received from server: ${event.data}');
+    function sock_onmessage(event) {
+        console.log('[message] Data received from server: ${event.data}');
     };
 
-    socket.onclose = function(event) {
+    function sock_onclose(event) {
+        hideLoader();
+        gotoSettingScreen();
         if (event.wasClean) {
-            alert('[close] Connection closed cleanly, code=${event.code} reason=${event.reason}');
+            console.log('[close] Connection closed cleanly, code=${event.code} reason=${event.reason}');
+            alert("Connection Closed");
         } else {
             // e.g. server process killed or network down
             // event.code is usually 1006 in this case
-            alert('[close] Connection died');
+            console.log('[close] Connection died');
+            alert("Connection Failed. Check Your Connection");
         }
+        
         connected = 0;
     };
 
-    socket.onerror = function(error) {
-        alert('[error]');
+    function sock_onerror(error) {
+        hideLoader();
+        gotoSettingScreen();
+        console.log('[error]' + error);
+        //alert("Connection Failed: "+error);
         connected = 0;
     };
+
+    function showLoader(text="Loading...") {
+        let loader = document.getElementById("id_loader");
+        let loader_text = document.getElementById("id_loader-text");
+        loader_text.innerHTML = text;
+        loader.style.display = "block";
+    }
+
+    function hideLoader() {
+        let loader = document.getElementById("id_loader");
+        let loader_text = document.getElementById("id_loader-text");
+        loader_text.innerHTML = "";
+        loader.style.display = "none";
+    }
+
+    function gotoTouchpadScreen() {
+        var setting = document.getElementById("id_setting_container");
+        var touchpad = document.getElementById("id_touchpad_container");
+        setting.style.display = "none";
+        touchpad.style.display = "block";
+    }
+
+    function gotoSettingScreen() {
+        var setting = document.getElementById("id_setting_container");
+        var touchpad = document.getElementById("id_touchpad_container");
+        touchpad.style.display = "none";
+        setting.style.display = "block";
+    }
+
+    function saveConnection(ip, port) {
+        localStorage.setItem("ip", ip);
+        localStorage.setItem("port", port);
+        IP = localStorage.getItem("ip");
+        PORT = localStorage.getItem("port");
+    }
+
+    function checkSavedConnection() {
+        if( localStorage.getItem("ip") == undefined ) {
+            return false;
+        }
+        if( localStorage.getItem("port") == undefined ) {
+            return false;
+        }
+        return true;
+    }
+
+    function connectWsServer(ip, port) {
+        if( (ip == undefined) || (ip == "")) {
+            alert("Enter valid Server Address");
+            return;
+        }
+        if( (port == undefined) || (port == "") ) {
+            alert("Enter valid Server Port");
+            return;
+        }
+        showLoader("Connecting...");
+        socket = new WebSocket("ws://" + ip +":"+ port);
+        socket.onopen = sock_onopen;
+        socket.onmessage = sock_onmessage;
+        socket.onclose = sock_onclose;
+        socket.onerror = sock_onerror;
+        
+    }
+
+    window.onload = function(event) {
+        console.log("page is fully loaded");
+        var chek = checkSavedConnection();
+        console.log(chek);
+        if( chek ) {
+            let ip = localStorage.getItem("ip");
+            let port = localStorage.getItem("port");
+            document.getElementById("id_server_address").value = ip;
+            document.getElementById("id_server_port").value = port;
+            connectWsServer(ip, port);
+        }
+    };
+
+
+    document.getElementById("id_save_setting").onclick = function() {
+        var ip = document.getElementById("id_server_address").value;
+        var port = document.getElementById("id_server_port").value;
+        saveConnection(ip, port);
+        connectWsServer(ip, port);
+    };
+
+    document.getElementById("id_touchpad_close").onclick = function() {
+        try {
+            socket.close();
+            gotoSettingScreen();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
 
     function send_msg(cmd, x=null, y=null) {
         if( connected ) {
