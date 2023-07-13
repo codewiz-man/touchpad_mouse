@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 
 import asyncio
 from websockets.server import serve
 from pynput.mouse import Button, Controller
 import webview
 import threading
-
+import qrcode
+import io
 
 SERVER_IP = ""
 SERVER_PORT = 2023
+SERVER_QRCODE = b""
+
 TOUCHSTART = 0x00
 TOUCHMOVE = 0x01
 TOUCHEND = 0x02
@@ -74,6 +77,7 @@ def get_local_ip():
         import socket
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
+        global SERVER_IP
         SERVER_IP = s.getsockname()[0]
         print(SERVER_IP)
         s.close()
@@ -81,6 +85,7 @@ def get_local_ip():
         print("Exception while getting IP: {}".format(e))
 
 async def _start_server():
+    global SERVER_IP, SERVER_PORT
     print('starting webserver at {}:{}'.format(SERVER_IP, SERVER_PORT))
     async with serve(echo, "0.0.0.0", SERVER_PORT):
         await asyncio.Future()  # run forever
@@ -91,32 +96,86 @@ def start_server():
 
 
 def open_confirmation_dialog(window):
-    result = window.create_confirmation_dialog('Question', 'Are you ok with this?')
-    if result:
-        print('User clicked OK')
-    else:
-        print('User clicked Cancel')
+    #get_local_ip()
+    print("SERVER IP: {}".format(SERVER_IP))
+    if SERVER_IP == "":
+        result = window.create_confirmation_dialog('No Connection Detected\nCheck Your Connection Settings and Try Again')
+        if result:
+            print('User clicked OK')
+        else:
+            print('User clicked Cancel')
+        window.destroy()
+    
+def get_server_port():
+    global SERVER_PORT
+    try:
+        with open('config.txt', 'r') as f:
+            fn = f.read()
+            if( len(fn) < 1):
+                SERVER_PORT = "2023"
+            SERVER_PORT = fn
+    except Exception as e:
+        print("file open error: {}".format(e))
+        SERVER_PORT = "2023"
+
+def get_qrcode_image():
+    global SERVER_IP, SERVER_PORT, SERVER_QRCODE
+    val = SERVER_IP + ":" + str(SERVER_PORT)
+    print(val)
+    #SERVER_QRCODE =  pyqrcode.create(val, mode='binary')
+    #print(SERVER_QRCODE.text())
+    qr = qrcode.QRCode()
+    qr.add_data(val)
+    #f = io.StringIO()
+    #qr.print_ascii(out=f)
+    #f.seek(0)
+    img = qr.make_image()
+    img.save('assets/qrcode.png')
+    #print(SERVER_QRCODE)
 
 class Api:
     def __init__(self):
-        self.cancel_heavy_stuff_flag = False
+        pass
 
     def get_server_ip(self):
-        response = {
-            'IP': 'Hello from Python {0}'.format(SERVER_IP)
-        }
-        return response
+        global SERVER_IP, SERVER_PORT
+        return [SERVER_IP, SERVER_PORT]
+
+    def save_server_ip(self, ip):
+        print("PORT: {}".format(ip))
+        with open('config.txt', 'w') as f:
+            try:
+                f.write(ip)
+                f.close()
+                return True
+            except Exception as e:
+                return False
+        #return False
+    
+    def get_server_qrcode(self):
+        #global SERVER_QRCODE
+        #return SERVER_QRCODE
+        try:
+            with open('assets/qrcode.png', 'rb') as f:
+                fs = f.read()
+                return fs.decode()
+        except Exception as e:
+            print("open img err: {}".format(e))
+            return ""
 
 
 def main():
     get_local_ip()
+    get_server_port()
+    get_qrcode_image()
 
     th = threading.Thread(target=start_server)
+    th.start()
 
     api = Api()
     window = webview.create_window('Touchpad Server', 'assets/index.html', confirm_close=False, js_api=api)
-    #webview.start(open_confirmation_dialog, window, debug=False)
-    webview.start()
+    webview.start(open_confirmation_dialog, window, debug=True)
+    #webview.start(debug=True)
 
 main()
 

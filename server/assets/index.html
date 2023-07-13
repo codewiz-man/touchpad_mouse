@@ -2,7 +2,11 @@
 <html>
 <head>
     <style>
+        html {
+            margin: 0; padding: 0;
+        }
         body {
+            margin: 0;
             min-width: 600px; min-height: 600px; font-family: Arial, Helvetica, sans-serif;
         }
         .C_container {
@@ -22,6 +26,7 @@
             width: calc(100% - 40px);
             margin: 5px 5px;
             border-bottom: 1px solid #e0e0e0;
+            max-width: 350px;
         }
 
         input[type=text]:disabled, input[type=number]:disabled, input[type=email]:disabled, input[type=password]:disabled { 
@@ -46,6 +51,7 @@
 
         .C_button_large {
             width: calc(100% - 20px);
+            max-width: 350px;
             text-align: center;
         }
 
@@ -67,10 +73,13 @@
             font-size: 20px; font-weight: bold; text-align: center;
             padding: 30px 0;
         }
+        .C_qrcode {
+            width: 250px; height: 250px; position: relative; margin: auto; margin-top: 150px; margin-left: 50px;
+        }
     </style>
     <title>Touchpad Server</title>
 </head>
-<body>
+<body id="id_body">
 
 <div class="C_container">
     <div class="C_left"> 
@@ -82,20 +91,64 @@
                 <input type="text" placeholder="Server Address" id="id_server_address" disabled>
             </div>
             <div>
-                <input type="text" placeholder="Server Port" value="2023">
+                <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
             </div>
             <button class="C_button_large" id="id_save_setting"> save </button>
         </div>
     </div>
     <div class="C_right">
-        <div id="id_qrcode"> 
-
+        <div> 
+            <img class="C_qrcode" id="id_qrcode" src="qrcode.png">
         </div>
     </div>
 </div>
 
 </body>
 <script>
+    /*var body = document.getElementById("id_body");
+    body.onload = function(){
+        pywebview.api.get_server_ip().then(function(res){
+            console.log(res);
+        });
+    };*/
+
+    window.addEventListener('pywebviewready', function() {
+        var server_ip = document.getElementById('id_server_address');
+        var server_port = document.getElementById('id_server_port');
+        pywebview.api.get_server_ip().then(function(res){
+            console.log(res);
+            server_ip.value = res[0];
+            server_port.value = res[1];
+        });
+
+        /*pywebview.api.get_server_qrcode().then(function(res) {
+            console.log(res);
+            var img = document.getElementById("id_qrcode");
+            img.src = 'data:image/png;base64,' + btoa(res);
+            document.body.appendChild(img);
+        });*/
+
+        
+        
+    })
+    
+
+    document.getElementById('id_save_setting').onclick = function(){
+        const port = document.getElementById("id_server_port").value;
+        if( (port == undefined) || (port == "" ) ){
+            alert("Enter Valid Server Port Number");
+            return;
+        }
+        pywebview.api.save_server_ip(port).then(function(res) {
+            if(res) {
+                alert("Saved Successfully.\nClose and Reopen the App to See the Changes");
+            } else {
+                alert("Settings Not Saved");
+            }
+            console.log(res);
+        });
+    };
+    
     
 </script>
 </html>
