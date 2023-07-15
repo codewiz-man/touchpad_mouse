@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
-<style>
+    <style>
     body {
         background-color: #f0f0f0;
         font-size: 20px;
@@ -133,53 +133,53 @@
 </style>
 </head>
 <body>
-    <div id="id_loader">
-        <p id="id_loader-text"> </p>
-    </div>
-    <div class="C_main">
-        <div class="C_setting_container" id="id_setting_container">
-            <div class="C_config-container">
-                <div class="C_config-head">
+<div id="id_loader">
+    <p id="id_loader-text"> </p>
+</div>
+<div class="C_main">
+    <div class="C_setting_container" id="id_setting_container">
+        <div class="C_config-container">
+            <div class="C_config-head">
                 Touchpad Connect
-                </div>
-                <div>
-                    <input type="text" placeholder="Server Address" id="id_server_address" >
-                </div>
-                <div>
-                    <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
-                </div>
-                <button class="C_button_large" id="id_save_setting"> save & connect </button> <br>
-                <div class="C_icon_text_button">
-                    <div> Scan and Connect </div>
-                    <div class="C_icon_button" id="id_touchpad_close">
-                        <img src="images/qr_code_scanner.png">
-                    </div>
-                </div>
-                
             </div>
-        </div>
-
-        <div class="C_touchpad_container" id="id_touchpad_container">
-            <div class="C_touchpad-header"> 
-                Mouse Pad 
+            <div>
+                <input type="text" placeholder="Server Address" id="id_server_address" >
+            </div>
+            <div>
+                <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
+            </div>
+            <button class="C_button_large" id="id_save_setting"> save & connect </button> <br>
+            <div class="C_icon_text_button" id="id_open_scanner">
+                <div> Scan and Connect </div>
                 <div class="C_icon_button" id="id_touchpad_close">
-                    <img src="images/close.png">
-                </div>
-            </div>
-            <div id="id_touchpad_area" class="C_touchpad_area" ontouchstart="myFunction()">
-                <div class="C_touchpad_scroll" id="id_touchpad_scroll"> </div>
-            </div>
-            <div class="C_touchpad_buttons">
-                <div class="C_touchpad-btn" id="id_touchpad_left">
-
-                </div>
-                <div class="C_touchpad-btn" id="id_touchpad_right">
-
+                    <img src="images/qr_code_scanner.png">
                 </div>
             </div>
 
         </div>
     </div>
+
+    <div class="C_touchpad_container" id="id_touchpad_container">
+        <div class="C_touchpad-header">
+            Mouse Pad
+            <div class="C_icon_button" id="id_touchpad_close">
+                <img src="images/close.png">
+            </div>
+        </div>
+        <div id="id_touchpad_area" class="C_touchpad_area" ontouchstart="myFunction()">
+            <div class="C_touchpad_scroll" id="id_touchpad_scroll"> </div>
+        </div>
+        <div class="C_touchpad_buttons">
+            <div class="C_touchpad-btn" id="id_touchpad_left">
+
+            </div>
+            <div class="C_touchpad-btn" id="id_touchpad_right">
+
+            </div>
+        </div>
+
+    </div>
+</div>
 
 <script>
     const TOUCHSTART = 0x00;
@@ -281,6 +281,8 @@
     }
 
     function connectWsServer(ip, port) {
+        alert(ip);
+        alert(port);
         if( (ip == undefined) || (ip == "")) {
             alert("Enter valid Server Address");
             return;
@@ -311,6 +313,9 @@
         }
     };
 
+    document.getElementById("id_open_scanner").onclick = function() {
+        Android.openScanner();
+    };
 
     document.getElementById("id_save_setting").onclick = function() {
         var ip = document.getElementById("id_server_address").value;
@@ -362,25 +367,45 @@
 
     var startX, startY;
     const touchpad_area = document.getElementById("id_touchpad_area");
-    var tapedTwice = false;
+    var t_start = false;
+    var d_tap = false;
+    //var tapedTwice = false;
+    var  mylatesttap;
     touchpad_area.ontouchstart = function(evt){
         startX = evt.touches[0].clientX;
         startY = evt.touches[0].clientY;
-        if(!tapedTwice) {
+
+        /*if(!tapedTwice) {
             tapedTwice = true;
-            send_msg(LEFT_CLICK, startX, startY);
+            send_msg(TOUCHSTART, startX, startY);
             setTimeout( function() { tapedTwice = false; }, 300 );
             return false;
+        }*/
+        var now = new Date().getTime();
+        var timesince = now - mylatesttap;
+        if((timesince < 300) && (timesince > 0)){
+            // double tap
+            d_tap = true;
+            send_msg(TOUCHSTART, startX, startY);
+        }else{
+            t_start = true;
+            // too much time to be a doubletap
         }
+
+        mylatesttap = new Date().getTime();
         event.preventDefault();
         //action on double tap goes below
         //alert('You tapped me Twice !!!');
         console.log("touchstart");
         //console.log(clientX, clientY);
-        send_msg(TOUCHSTART, startX, startY);
-        
+
+
     };
     touchpad_area.ontouchmove = function(evt){
+    	if(t_start) {
+    	    t_start = false;
+    	}
+
         //console.log(evt);
         const clientX =  evt.touches[0].clientX - startX;
         const clientY =  evt.touches[0].clientY - startY;
@@ -389,7 +414,18 @@
         startX = evt.touches[0].clientX;
         startY = evt.touches[0].clientY;
     };
+
     touchpad_area.ontouchend = function(evt){
+    	if(t_start) {
+    	    t_start = false;
+    	    if(d_tap) {
+    	        d_tap = false;
+    	        send_msg(TOUCHEND);
+    	    } else {
+    	        send_msg(LEFT_CLICK);
+    	    }
+    	}
+
         //if(tapedTwice) {
             //tapedTwice = false;
             console.log("touchend");
@@ -397,7 +433,7 @@
             //const clientX = evt.touches[0].clientX;
             //const clientY = evt.touches[0].clientY;
             //console.log(clientX, clientY);
-            send_msg(TOUCHEND);
+            //send_msg(TOUCHEND);
         //}
     };
 
@@ -420,9 +456,9 @@
         const delY = sc_scrollY - sc_startY;
         console.log(delY);
         if(delY > 0) {
-            send_msg(SCROLL, 2);
+            send_msg(SCROLL, 1);
         } else {
-            send_msg(SCROLL, -2);
+            send_msg(SCROLL, -1);
         }
     };
     touchpad_scroll.ontouchend = function(evt){
