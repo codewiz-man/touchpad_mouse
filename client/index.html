@@ -225,14 +225,14 @@
             console.log('[close] Connection died');
             alert("Connection Failed. Check Your Connection");
         }
-        
+
         connected = 0;
     };
 
     function sock_onerror(error) {
         hideLoader();
         gotoSettingScreen();
-        console.log('[error]' + error);
+        console.log(error.code, error.reason);
         //alert("Connection Failed: "+error);
         connected = 0;
     };
@@ -299,7 +299,7 @@
         socket.onmessage = sock_onmessage;
         socket.onclose = sock_onclose;
         socket.onerror = sock_onerror;
-        
+
     }
 
     window.onload = function(event) {
@@ -315,25 +315,25 @@
         }
     };
 
-    document.getElementById("id_open_scanner").onclick = function() {
+    document.getElementById("id_open_scanner").addEventListener('click', function() {
         Android.openScanner();
-    };
+    });
 
-    document.getElementById("id_save_setting").onclick = function() {
+    document.getElementById("id_save_setting").addEventListener('click', function() {
         var ip = document.getElementById("id_server_address").value;
         var port = document.getElementById("id_server_port").value;
         saveConnection(ip, port);
         connectWsServer(ip, port);
-    };
+    });
 
-    document.getElementById("id_touchpad_close").onclick = function() {
+    document.getElementById("id_touchpad_close").addEventListener('click', function() {
         try {
             socket.close();
             gotoSettingScreen();
         } catch (error) {
             console.log(error);
         }
-    };
+    });
 
 
 
@@ -343,7 +343,7 @@
                 //const msg = cmd + "_" + x + "_" + y;
                 /*var data = new Uint8Array( 3 );
                 data[0] = cmd;
-                
+
                 if(x!=null) {
                     data[1] = Math.round(x);
                 }
@@ -352,7 +352,7 @@
                 }
                 console.log(x,y);
                 console.log("\n");
-                
+
                 socket.send(data.buffer);*/
                 /*if( (x!=null) && (y != null)) {
                     socket.send(cmd + "_" + Math.round(x) + "_" + Math.round(y));
@@ -361,7 +361,7 @@
                 }*/
                 //socket.send(cmd + "_" + x.toFixed(2) + "_" + y.toFixed(2));
                 socket.send(msg);
-                
+
             } catch (error) {
                 console.log("error: "+ error);
             }
@@ -374,7 +374,7 @@
     var d_tap = false;
     //var tapedTwice = false;
     var  mylatesttap;
-    touchpad_area.ontouchstart = function(evt){
+    touchpad_area.addEventListener('touchstart', function(evt){
         startX = evt.touches[0].clientX;
         startY = evt.touches[0].clientY;
         //return;
@@ -387,7 +387,7 @@
         }*/
         var now = new Date().getTime();
         var timesince = now - mylatesttap;
-        if((timesince < 300) && (timesince > 0)){
+        if((timesince < 200) && (timesince > 0)){
             // double tap
             d_tap = true;
             //send_msg(TOUCHSTART + DELIMITTER + startX.toFixed(2) + DELIMITTER + startY.toFixed(2));
@@ -405,7 +405,7 @@
         //console.log(clientX, clientY);
 
 
-    };
+    });
 
     /*touchpad_area.ondblclick = function(evt) {
         //startX = evt.touches[0].clientX;
@@ -413,7 +413,7 @@
         send_msg(TOUCHSTART, 0,0);
     }*/
 
-    touchpad_area.ontouchmove = function(evt){
+    touchpad_area.addEventListener('touchmove', function(evt){
     	if(t_start) {
     	    t_start = false;
     	}
@@ -425,13 +425,13 @@
         send_msg(TOUCHMOVE + DELIMITTER + clientX.toFixed(5) + DELIMITTER + clientY.toFixed(5));
         startX = evt.touches[0].clientX;
         startY = evt.touches[0].clientY;
-    };
+    });
 
-    touchpad_area.onclick = function(evt){
+    touchpad_area.addEventListener('click', function(evt){
         send_msg(LEFT_CLICK);
-    }
+    });
 
-    touchpad_area.ontouchend = function(evt){
+    touchpad_area.addEventListener('touchend', function(evt){
 
         if(d_tap) {
             d_tap = false;
@@ -443,16 +443,17 @@
             //console.log(clientX, clientY);
             send_msg(TOUCHEND);
         }
-    };
+    });
 
     const touchpad_scroll = document.getElementById("id_touchpad_scroll");
     var sc_startY, sc_scrollY;
-    touchpad_scroll.ontouchstart = function(evt){
+    touchpad_scroll.addEventListener('touchstart', function(evt){
         evt.stopPropagation();
         //sc_startX = evt.touches[0].clientX;
         sc_startY = evt.touches[0].clientY;
-    }
-    touchpad_scroll.ontouchmove = function(evt){
+    });
+
+    touchpad_scroll.addEventListener('touchmove', function(evt){
         //evt.preventDefault();
         evt.stopPropagation();
         console.log("scroll");
@@ -468,21 +469,22 @@
         } else {
             send_msg(SCROLL + DELIMITTER + "-1");
         }
-    };
-    touchpad_scroll.ontouchend = function(evt){
+    });
+
+    touchpad_scroll.addEventListener('touchend', function(evt){
         evt.stopPropagation();
-        
-    }
+
+    });
 
     const left_btn = document.getElementById("id_touchpad_left");
-    left_btn.onclick = function(evt){
+    left_btn.addEventListener('click', function(evt){
         //evt.preventDefault();
         console.log("left down");
         //const clientX = evt.touches[0].clientX - startX;
         //const clientY = evt.touches[0].clientY - startY;
         //console.log(clientX, clientY);
         send_msg(LEFT_CLICK);
-    };
+    });
 
     /*left_btn.onmousedown = function(evt){
         //evt.preventDefault();
@@ -503,14 +505,14 @@
     };*/
 
     const right_btn = document.getElementById("id_touchpad_right");
-    right_btn.onclick = function(evt){
+    right_btn.addEventListener('click', function(evt){
         //evt.preventDefault();
         console.log("right down");
         //const clientX = evt.touches[0].clientX - startX;
         //const clientY = evt.touches[0].clientY - startY;
         //console.log(clientX, clientY);
         send_msg(RIGHT_CLICK);
-    };
+    });
     /*right_btn.onmousedown = function(evt){
         //evt.preventDefault();
         console.log("right down");
@@ -528,7 +530,7 @@
         //console.log(clientX, clientY);
         send_msg(RIGHT_BTN_RELEASE);
     };*/
-    
+
 
 </script>
 
