@@ -182,20 +182,22 @@
 </div>
 
 <script>
-    const TOUCHSTART = 0x00;
-    const TOUCHMOVE = 0x01;
-    const TOUCHEND = 0x02;
-    const LEFT_BTN_PRESS = 0x03;
-    const LEFT_BTN_RELEASE = 0x04;
-    const RIGHT_BTN_PRESS = 0x05;
-    const RIGHT_BTN_RELEASE = 0x06;
-    const SCROLL = 0x07;
-    const LEFT_CLICK = 0x08;
-    const RIGHT_CLICK = 0x09;
+    const TOUCHSTART = "00";
+    const TOUCHMOVE = "01";
+    const TOUCHEND = "02";
+    const LEFT_BTN_PRESS = "03";
+    const LEFT_BTN_RELEASE = "04";
+    const RIGHT_BTN_PRESS = "05";
+    const RIGHT_BTN_RELEASE = "06";
+    const SCROLL = "07";
+    const LEFT_CLICK = "08";
+    const RIGHT_CLICK = "09";
+    const DBL_CLICK = "10";
     let IP = "192.168.0.141"
     let PORT  = 2023
     var socket;
     let connected = false;
+    const DELIMITTER = "_";
 
     function sock_onopen(e) {
         alert("[open] Connection established");
@@ -335,7 +337,7 @@
 
 
 
-    function send_msg(cmd, x=null, y=null) {
+    function send_msg(msg) {
         if( connected ) {
             try {
                 //const msg = cmd + "_" + x + "_" + y;
@@ -357,7 +359,8 @@
                 } else {
                     socket.send(cmd+"");
                 }*/
-                socket.send(cmd + "_" + Math.round(x) + "_" + Math.round(y));
+                //socket.send(cmd + "_" + x.toFixed(2) + "_" + y.toFixed(2));
+                socket.send(msg);
                 
             } catch (error) {
                 console.log("error: "+ error);
@@ -374,6 +377,7 @@
     touchpad_area.ontouchstart = function(evt){
         startX = evt.touches[0].clientX;
         startY = evt.touches[0].clientY;
+        //return;
 
         /*if(!tapedTwice) {
             tapedTwice = true;
@@ -386,14 +390,15 @@
         if((timesince < 300) && (timesince > 0)){
             // double tap
             d_tap = true;
-            send_msg(TOUCHSTART, startX, startY);
+            //send_msg(TOUCHSTART + DELIMITTER + startX.toFixed(2) + DELIMITTER + startY.toFixed(2));
+            send_msg(TOUCHSTART);
         }else{
             t_start = true;
             // too much time to be a doubletap
         }
 
         mylatesttap = new Date().getTime();
-        event.preventDefault();
+        //event.preventDefault();
         //action on double tap goes below
         //alert('You tapped me Twice !!!');
         console.log("touchstart");
@@ -401,6 +406,13 @@
 
 
     };
+
+    /*touchpad_area.ondblclick = function(evt) {
+        //startX = evt.touches[0].clientX;
+        //startY = evt.touches[0].clientY;
+        send_msg(TOUCHSTART, 0,0);
+    }*/
+
     touchpad_area.ontouchmove = function(evt){
     	if(t_start) {
     	    t_start = false;
@@ -410,31 +422,27 @@
         const clientX =  evt.touches[0].clientX - startX;
         const clientY =  evt.touches[0].clientY - startY;
         console.log(clientX, clientY);
-        send_msg(TOUCHMOVE, clientX, clientY);
+        send_msg(TOUCHMOVE + DELIMITTER + clientX.toFixed(5) + DELIMITTER + clientY.toFixed(5));
         startX = evt.touches[0].clientX;
         startY = evt.touches[0].clientY;
     };
 
-    touchpad_area.ontouchend = function(evt){
-    	if(t_start) {
-    	    t_start = false;
-    	    if(d_tap) {
-    	        d_tap = false;
-    	        send_msg(TOUCHEND);
-    	    } else {
-    	        send_msg(LEFT_CLICK);
-    	    }
-    	}
+    touchpad_area.onclick = function(evt){
+        send_msg(LEFT_CLICK);
+    }
 
-        //if(tapedTwice) {
+    touchpad_area.ontouchend = function(evt){
+
+        if(d_tap) {
+            d_tap = false;
             //tapedTwice = false;
             console.log("touchend");
             //console.log(evt);
             //const clientX = evt.touches[0].clientX;
             //const clientY = evt.touches[0].clientY;
             //console.log(clientX, clientY);
-            //send_msg(TOUCHEND);
-        //}
+            send_msg(TOUCHEND);
+        }
     };
 
     const touchpad_scroll = document.getElementById("id_touchpad_scroll");
@@ -456,9 +464,9 @@
         const delY = sc_scrollY - sc_startY;
         console.log(delY);
         if(delY > 0) {
-            send_msg(SCROLL, 1);
+            send_msg(SCROLL + DELIMITTER + "1");
         } else {
-            send_msg(SCROLL, -1);
+            send_msg(SCROLL + DELIMITTER + "-1");
         }
     };
     touchpad_scroll.ontouchend = function(evt){
@@ -467,7 +475,16 @@
     }
 
     const left_btn = document.getElementById("id_touchpad_left");
-    left_btn.onmousedown = function(evt){
+    left_btn.onclick = function(evt){
+        //evt.preventDefault();
+        console.log("left down");
+        //const clientX = evt.touches[0].clientX - startX;
+        //const clientY = evt.touches[0].clientY - startY;
+        //console.log(clientX, clientY);
+        send_msg(LEFT_CLICK);
+    };
+
+    /*left_btn.onmousedown = function(evt){
         //evt.preventDefault();
         console.log("left down");
         //const clientX = evt.touches[0].clientX - startX;
@@ -483,10 +500,18 @@
         //const clientY = evt.touches[0].clientY - startY;
         //console.log(clientX, clientY);
         send_msg(LEFT_BTN_RELEASE);
-    };
+    };*/
 
     const right_btn = document.getElementById("id_touchpad_right");
-    right_btn.onmousedown = function(evt){
+    right_btn.onclick = function(evt){
+        //evt.preventDefault();
+        console.log("right down");
+        //const clientX = evt.touches[0].clientX - startX;
+        //const clientY = evt.touches[0].clientY - startY;
+        //console.log(clientX, clientY);
+        send_msg(RIGHT_CLICK);
+    };
+    /*right_btn.onmousedown = function(evt){
         //evt.preventDefault();
         console.log("right down");
         //const clientX = evt.touches[0].clientX - startX;
@@ -502,7 +527,7 @@
         //const clientY = evt.touches[0].clientY - startY;
         //console.log(clientX, clientY);
         send_msg(RIGHT_BTN_RELEASE);
-    };
+    };*/
     
 
 </script>
