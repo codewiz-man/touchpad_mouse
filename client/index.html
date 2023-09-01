@@ -133,403 +133,350 @@
 </style>
 </head>
 <body>
-<div id="id_loader">
-    <p id="id_loader-text"> </p>
-</div>
-<div class="C_main">
-    <div class="C_setting_container" id="id_setting_container">
-        <div class="C_config-container">
-            <div class="C_config-head">
-                Touchpad Connect
-            </div>
-            <div>
-                <input type="text" placeholder="Server Address" id="id_server_address" >
-            </div>
-            <div>
-                <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
-            </div>
-            <button class="C_button_large" id="id_save_setting"> save & connect </button> <br>
-            <div class="C_icon_text_button" id="id_open_scanner">
-                <div> Scan and Connect </div>
-                <div class="C_icon_button" id="id_touchpad_close">
-                    <img src="images/qr_code_scanner.png">
+    <div id="id_loader">
+        <p id="id_loader-text"> </p>
+    </div>
+    <div class="C_main">
+        <!-- Container for setting related content -->
+        <div class="C_setting_container" id="id_setting_container">
+            <!-- Container for configuration options -->
+            <div class="C_config-container">
+                <!-- Header for the configuration section -->
+                <div class="C_config-head">
+                    Touchpad Connect
+                </div>
+                <!-- Input field for server address -->
+                <div>
+                    <input type="text" placeholder="Server Address" id="id_server_address" >
+                </div>
+                <!-- Input field for server port with a default value -->
+                <div>
+                    <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
+                </div>
+                <!-- Button for saving settings and connecting -->
+                <button class="C_button_large" id="id_save_setting"> save & connect </button> <br>
+                <!-- Container for an icon and text button to scan and connect -->
+                <div class="C_icon_text_button" id="id_open_scanner">
+                    <!-- Text for the button -->
+                    <div> Scan and Connect </div>
+                    <!-- Icon button for QR code scanning -->
+                    <div class="C_icon_button" id="id_touchpad_close">
+                        <img src="images/qr_code_scanner.png">
+                    </div>
                 </div>
             </div>
-
+        </div>
+    
+        <!-- Container for touchpad-related content -->
+        <div class="C_touchpad_container" id="id_touchpad_container">
+            <!-- Header for the touchpad section -->
+            <div class="C_touchpad-header">
+                Mouse Pad
+                <!-- Icon button to close the touchpad section -->
+                <div class="C_icon_button" id="id_touchpad_close">
+                    <img src="images/close.png">
+                </div>
+            </div>
+            <!-- Container for the touchpad area -->
+            <div id="id_touchpad_area" class="C_touchpad_area" ontouchstart="myFunction()">
+                <!-- Container for the touchpad scroll area -->
+                <div class="C_touchpad_scroll" id="id_touchpad_scroll"> </div>
+            </div>
+            <!-- Container for touchpad buttons -->
+            <div class="C_touchpad_buttons">
+                <!-- Left touchpad button -->
+                <div class="C_touchpad-btn" id="id_touchpad_left">
+    
+                </div>
+                <!-- Right touchpad button -->
+                <div class="C_touchpad-btn" id="id_touchpad_right">
+    
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="C_touchpad_container" id="id_touchpad_container">
-        <div class="C_touchpad-header">
-            Mouse Pad
-            <div class="C_icon_button" id="id_touchpad_close">
-                <img src="images/close.png">
-            </div>
-        </div>
-        <div id="id_touchpad_area" class="C_touchpad_area" ontouchstart="myFunction()">
-            <div class="C_touchpad_scroll" id="id_touchpad_scroll"> </div>
-        </div>
-        <div class="C_touchpad_buttons">
-            <div class="C_touchpad-btn" id="id_touchpad_left">
-
-            </div>
-            <div class="C_touchpad-btn" id="id_touchpad_right">
-
-            </div>
-        </div>
-
-    </div>
-</div>
+    
 
 <script>
-    const TOUCHSTART = "00";
-    const TOUCHMOVE = "01";
-    const TOUCHEND = "02";
-    const LEFT_BTN_PRESS = "03";
-    const LEFT_BTN_RELEASE = "04";
-    const RIGHT_BTN_PRESS = "05";
-    const RIGHT_BTN_RELEASE = "06";
-    const SCROLL = "07";
-    const LEFT_CLICK = "08";
-    const RIGHT_CLICK = "09";
-    const DBL_CLICK = "10";
-    let IP = "192.168.0.141"
-    let PORT  = 2023
-    var socket;
-    let connected = false;
-    const DELIMITTER = "_";
+   // Constants for different touchpad actions
+const TOUCHSTART = "00";
+const TOUCHMOVE = "01";
+const TOUCHEND = "02";
+const LEFT_BTN_PRESS = "03";
+const LEFT_BTN_RELEASE = "04";
+const RIGHT_BTN_PRESS = "05";
+const RIGHT_BTN_RELEASE = "06";
+const SCROLL = "07";
+const LEFT_CLICK = "08";
+const RIGHT_CLICK = "09";
+const DBL_CLICK = "10";
 
-    function sock_onopen(e) {
-        alert("[open] Connection established");
-        connected = 1;
-        socket.binaryType = "arraybuffer";
-        //alert("Sending to server");
-        //socket.send("My name is John");
-        hideLoader();
-        gotoTouchpadScreen();
-    };
+// Default IP and PORT values
+let IP = "192.168.0.1";
+let PORT  = 2023;
 
-    function sock_onmessage(event) {
-        console.log('[message] Data received from server: ${event.data}');
-    };
+// WebSocket object for communication
+var socket;
 
-    function sock_onclose(event) {
-        hideLoader();
-        gotoSettingScreen();
-        if (event.wasClean) {
-            console.log('[close] Connection closed cleanly, code=${event.code} reason=${event.reason}');
-            alert("Connection Closed");
-        } else {
-            // e.g. server process killed or network down
-            // event.code is usually 1006 in this case
-            console.log('[close] Connection died');
-            alert("Connection Failed. Check Your Connection");
-        }
+// Flag to track if connected to the server
+let connected = false;
 
-        connected = 0;
-    };
+// Delimiter used in communication
+const DELIMITER = "_";
 
-    function sock_onerror(error) {
-        hideLoader();
-        gotoSettingScreen();
-        console.log(error.code, error.reason);
-        //alert("Connection Failed: "+error);
-        connected = 0;
-    };
+// Function to handle WebSocket connection open event
+function sock_onopen(e) {
+    alert("[open] Connection established");
+    connected = true;
+    socket.binaryType = "arraybuffer";
+    hideLoader();
+    gotoTouchpadScreen();
+};
 
-    function showLoader(text="Loading...") {
-        let loader = document.getElementById("id_loader");
-        let loader_text = document.getElementById("id_loader-text");
-        loader_text.innerHTML = text;
-        loader.style.display = "block";
+// Function to handle WebSocket message event
+function sock_onmessage(event) {
+    console.log('[message] Data received from server: ${event.data}');
+};
+
+// Function to handle WebSocket connection close event
+function sock_onclose(event) {
+    hideLoader();
+    gotoSettingScreen();
+    if (event.wasClean) {
+        console.log('[close] Connection closed cleanly, code=${event.code} reason=${event.reason}');
+        alert("Connection Closed");
+    } else {
+        // e.g. server process killed or network down
+        // event.code is usually 1006 in this case
+        console.log('[close] Connection died');
+        alert("Connection Failed. Check Your Connection");
     }
+    connected = false;
+};
 
-    function hideLoader() {
-        let loader = document.getElementById("id_loader");
-        let loader_text = document.getElementById("id_loader-text");
-        loader_text.innerHTML = "";
-        loader.style.display = "none";
+// Function to handle WebSocket connection error event
+function sock_onerror(error) {
+    hideLoader();
+    gotoSettingScreen();
+    console.log(error.code, error.reason);
+    connected = false;
+};
+
+// Function to show a loading screen with optional text
+function showLoader(text = "Loading...") {
+    let loader = document.getElementById("id_loader");
+    let loader_text = document.getElementById("id_loader-text");
+    loader_text.innerHTML = text;
+    loader.style.display = "block";
+}
+
+// Function to hide the loading screen
+function hideLoader() {
+    let loader = document.getElementById("id_loader");
+    let loader_text = document.getElementById("id_loader-text");
+    loader_text.innerHTML = "";
+    loader.style.display = "none";
+}
+
+// Function to switch to the touchpad screen
+function gotoTouchpadScreen() {
+    var setting = document.getElementById("id_setting_container");
+    var touchpad = document.getElementById("id_touchpad_container");
+    setting.style.display = "none";
+    touchpad.style.display = "block";
+}
+
+// Function to switch to the setting screen
+function gotoSettingScreen() {
+    var setting = document.getElementById("id_setting_container");
+    var touchpad = document.getElementById("id_touchpad_container");
+    touchpad.style.display = "none";
+    setting.style.display = "block";
+}
+
+// Function to save the server IP and PORT to local storage
+function saveConnection(ip, port) {
+    localStorage.setItem("ip", ip);
+    localStorage.setItem("port", port);
+    IP = localStorage.getItem("ip");
+    PORT = localStorage.getItem("port");
+}
+
+// Function to check if there is a saved server connection
+function checkSavedConnection() {
+    if( localStorage.getItem("ip") == undefined ) {
+        return false;
     }
-
-    function gotoTouchpadScreen() {
-        var setting = document.getElementById("id_setting_container");
-        var touchpad = document.getElementById("id_touchpad_container");
-        setting.style.display = "none";
-        touchpad.style.display = "block";
+    if( localStorage.getItem("port") == undefined ) {
+        return false;
     }
+    return true;
+}
 
-    function gotoSettingScreen() {
-        var setting = document.getElementById("id_setting_container");
-        var touchpad = document.getElementById("id_touchpad_container");
-        touchpad.style.display = "none";
-        setting.style.display = "block";
+
+    // Function to connect to the WebSocket server using the provided IP and port
+function connectWsServer(ip, port) {
+    alert(ip);
+    alert(port);
+    if( (ip == undefined) || (ip == "")) {
+        alert("Enter a valid Server Address");
+        return;
     }
-
-    function saveConnection(ip, port) {
-        localStorage.setItem("ip", ip);
-        localStorage.setItem("port", port);
-        IP = localStorage.getItem("ip");
-        PORT = localStorage.getItem("port");
+    if( (port == undefined) || (port == "") ) {
+        alert("Enter a valid Server Port");
+        return;
     }
+    showLoader("Connecting...");
+    socket = new WebSocket("ws://" + ip +":"+ port);
+    socket.onopen = sock_onopen;
+    socket.onmessage = sock_onmessage;
+    socket.onclose = sock_onclose;
+    socket.onerror = sock_onerror;
+}
 
-    function checkSavedConnection() {
-        if( localStorage.getItem("ip") == undefined ) {
-            return false;
-        }
-        if( localStorage.getItem("port") == undefined ) {
-            return false;
-        }
-        return true;
-    }
-
-    function connectWsServer(ip, port) {
-        alert(ip);
-        alert(port);
-        if( (ip == undefined) || (ip == "")) {
-            alert("Enter valid Server Address");
-            return;
-        }
-        if( (port == undefined) || (port == "") ) {
-            alert("Enter valid Server Port");
-            return;
-        }
-        showLoader("Connecting...");
-        socket = new WebSocket("ws://" + ip +":"+ port);
-        socket.onopen = sock_onopen;
-        socket.onmessage = sock_onmessage;
-        socket.onclose = sock_onclose;
-        socket.onerror = sock_onerror;
-
-    }
-
-    window.onload = function(event) {
-        console.log("page is fully loaded");
-        var chek = checkSavedConnection();
-        console.log(chek);
-        if( chek ) {
-            let ip = localStorage.getItem("ip");
-            let port = localStorage.getItem("port");
-            document.getElementById("id_server_address").value = ip;
-            document.getElementById("id_server_port").value = port;
-            connectWsServer(ip, port);
-        }
-    };
-
-    document.getElementById("id_open_scanner").addEventListener('click', function() {
-        Android.openScanner();
-    });
-
-    document.getElementById("id_save_setting").addEventListener('click', function() {
-        var ip = document.getElementById("id_server_address").value;
-        var port = document.getElementById("id_server_port").value;
-        saveConnection(ip, port);
+// Function to execute when the window is fully loaded
+window.onload = function(event) {
+    console.log("page is fully loaded");
+    /*var chek = checkSavedConnection();
+    console.log(chek);
+    if( chek ) {
+        let ip = localStorage.getItem("ip");
+        let port = localStorage.getItem("port");
+        document.getElementById("id_server_address").value = ip;
+        document.getElementById("id_server_port").value = port;
         connectWsServer(ip, port);
-    });
+    }*/
+};
 
-    document.getElementById("id_touchpad_close").addEventListener('click', function() {
+// Event listener for opening the scanner
+document.getElementById("id_open_scanner").addEventListener('click', function() {
+    Android.openScanner();
+});
+
+// Event listener for saving settings and connecting
+document.getElementById("id_save_setting").addEventListener('click', function() {
+    var ip = document.getElementById("id_server_address").value;
+    var port = document.getElementById("id_server_port").value;
+    saveConnection(ip, port);
+    connectWsServer(ip, port);
+});
+
+// Event listener for closing the touchpad screen
+document.getElementById("id_touchpad_close").addEventListener('click', function() {
+    try {
+        socket.close();
+        gotoSettingScreen();
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+// Function to send a message to the server
+function send_msg(msg) {
+    if( connected ) {
         try {
-            socket.close();
-            gotoSettingScreen();
+            socket.send(msg);
         } catch (error) {
-            console.log(error);
-        }
-    });
-
-
-
-    function send_msg(msg) {
-        if( connected ) {
-            try {
-                //const msg = cmd + "_" + x + "_" + y;
-                /*var data = new Uint8Array( 3 );
-                data[0] = cmd;
-
-                if(x!=null) {
-                    data[1] = Math.round(x);
-                }
-                if(y!=null) {
-                    data[2] = Math.round(y);
-                }
-                console.log(x,y);
-                console.log("\n");
-
-                socket.send(data.buffer);*/
-                /*if( (x!=null) && (y != null)) {
-                    socket.send(cmd + "_" + Math.round(x) + "_" + Math.round(y));
-                } else {
-                    socket.send(cmd+"");
-                }*/
-                //socket.send(cmd + "_" + x.toFixed(2) + "_" + y.toFixed(2));
-                socket.send(msg);
-
-            } catch (error) {
-                console.log("error: "+ error);
-            }
+            console.log("error: "+ error);
         }
     }
+}
 
-    var startX, startY;
-    const touchpad_area = document.getElementById("id_touchpad_area");
-    var t_start = false;
-    var d_tap = false;
-    //var tapedTwice = false;
-    var  mylatesttap;
-    touchpad_area.addEventListener('touchstart', function(evt){
-        startX = evt.touches[0].clientX;
-        startY = evt.touches[0].clientY;
-        //return;
+var startX, startY;
+const touchpad_area = document.getElementById("id_touchpad_area");
+var t_start = false;
+var d_tap = false;
+var  mylatesttap;
 
-        /*if(!tapedTwice) {
-            tapedTwice = true;
-            send_msg(TOUCHSTART, startX, startY);
-            setTimeout( function() { tapedTwice = false; }, 300 );
-            return false;
-        }*/
-        var now = new Date().getTime();
-        var timesince = now - mylatesttap;
-        if((timesince < 200) && (timesince > 0)){
-            // double tap
-            d_tap = true;
-            //send_msg(TOUCHSTART + DELIMITTER + startX.toFixed(2) + DELIMITTER + startY.toFixed(2));
-            send_msg(TOUCHSTART);
-        }else{
-            t_start = true;
-            // too much time to be a doubletap
-        }
+// Event listener for touchstart on the touchpad area
+touchpad_area.addEventListener('touchstart', function(evt){
+    startX = evt.touches[0].clientX;
+    startY = evt.touches[0].clientY;
 
-        mylatesttap = new Date().getTime();
-        //event.preventDefault();
-        //action on double tap goes below
-        //alert('You tapped me Twice !!!');
-        console.log("touchstart");
-        //console.log(clientX, clientY);
+    var now = new Date().getTime();
+    var timesince = now - mylatesttap;
+    if((timesince < 200) && (timesince > 0)){
+        // double tap
+        d_tap = true;
+        send_msg(TOUCHSTART);
+    } else {
+        t_start = true;
+    }
+
+    mylatesttap = new Date().getTime();
+    console.log("touchstart");
+});
 
 
-    });
+    // Event listener for touchmove on the touchpad area
+touchpad_area.addEventListener('touchmove', function(evt){
+    if(t_start) {
+        t_start = false;
+    }
+    const clientX =  evt.touches[0].clientX - startX;
+    const clientY =  evt.touches[0].clientY - startY;
+    console.log(clientX, clientY);
+    send_msg(TOUCHMOVE + DELIMITER + clientX.toFixed(5) + DELIMITER + clientY.toFixed(5));
+    startX = evt.touches[0].clientX;
+    startY = evt.touches[0].clientY;
+});
 
-    /*touchpad_area.ondblclick = function(evt) {
-        //startX = evt.touches[0].clientX;
-        //startY = evt.touches[0].clientY;
-        send_msg(TOUCHSTART, 0,0);
-    }*/
+// Event listener for click on the touchpad area
+touchpad_area.addEventListener('click', function(evt){
+    send_msg(LEFT_CLICK);
+});
 
-    touchpad_area.addEventListener('touchmove', function(evt){
-    	if(t_start) {
-    	    t_start = false;
-    	}
+// Event listener for touchend on the touchpad area
+touchpad_area.addEventListener('touchend', function(evt){
+    if(d_tap) {
+        d_tap = false;
+        console.log("touchend");
+        send_msg(TOUCHEND);
+    }
+});
 
-        //console.log(evt);
-        const clientX =  evt.touches[0].clientX - startX;
-        const clientY =  evt.touches[0].clientY - startY;
-        console.log(clientX, clientY);
-        send_msg(TOUCHMOVE + DELIMITTER + clientX.toFixed(5) + DELIMITTER + clientY.toFixed(5));
-        startX = evt.touches[0].clientX;
-        startY = evt.touches[0].clientY;
-    });
+// Event listeners for touchpad scrolling
+const touchpad_scroll = document.getElementById("id_touchpad_scroll");
+var sc_startY, sc_scrollY;
 
-    touchpad_area.addEventListener('click', function(evt){
-        send_msg(LEFT_CLICK);
-    });
+// Event listener for touchstart on the touchpad scroll area
+touchpad_scroll.addEventListener('touchstart', function(evt){
+    evt.stopPropagation();
+    sc_startY = evt.touches[0].clientY;
+});
 
-    touchpad_area.addEventListener('touchend', function(evt){
+// Event listener for touchmove on the touchpad scroll area
+touchpad_scroll.addEventListener('touchmove', function(evt){
+    evt.stopPropagation();
+    console.log("scroll");
+    sc_scrollY = evt.touches[0].clientY;
+    const delY = sc_scrollY - sc_startY;
+    console.log(delY);
+    if(delY > 0) {
+        send_msg(SCROLL + DELIMITER + "1");
+    } else {
+        send_msg(SCROLL + DELIMITER + "-1");
+    }
+});
 
-        if(d_tap) {
-            d_tap = false;
-            //tapedTwice = false;
-            console.log("touchend");
-            //console.log(evt);
-            //const clientX = evt.touches[0].clientX;
-            //const clientY = evt.touches[0].clientY;
-            //console.log(clientX, clientY);
-            send_msg(TOUCHEND);
-        }
-    });
+// Event listener for touchend on the touchpad scroll area
+touchpad_scroll.addEventListener('touchend', function(evt){
+    evt.stopPropagation();
+});
 
-    const touchpad_scroll = document.getElementById("id_touchpad_scroll");
-    var sc_startY, sc_scrollY;
-    touchpad_scroll.addEventListener('touchstart', function(evt){
-        evt.stopPropagation();
-        //sc_startX = evt.touches[0].clientX;
-        sc_startY = evt.touches[0].clientY;
-    });
+// Event listener for left button click
+const left_btn = document.getElementById("id_touchpad_left");
+left_btn.addEventListener('click', function(evt){
+    console.log("left down");
+    send_msg(LEFT_CLICK);
+});
 
-    touchpad_scroll.addEventListener('touchmove', function(evt){
-        //evt.preventDefault();
-        evt.stopPropagation();
-        console.log("scroll");
-        sc_scrollY = evt.touches[0].clientY;
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        //send_msg(SCROLL);
-        const delY = sc_scrollY - sc_startY;
-        console.log(delY);
-        if(delY > 0) {
-            send_msg(SCROLL + DELIMITTER + "1");
-        } else {
-            send_msg(SCROLL + DELIMITTER + "-1");
-        }
-    });
-
-    touchpad_scroll.addEventListener('touchend', function(evt){
-        evt.stopPropagation();
-
-    });
-
-    const left_btn = document.getElementById("id_touchpad_left");
-    left_btn.addEventListener('click', function(evt){
-        //evt.preventDefault();
-        console.log("left down");
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        send_msg(LEFT_CLICK);
-    });
-
-    /*left_btn.onmousedown = function(evt){
-        //evt.preventDefault();
-        console.log("left down");
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        send_msg(LEFT_BTN_PRESS);
-    };
-
-    left_btn.onmouseup = function(evt){
-        //evt.preventDefault();
-        console.log("left up");
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        send_msg(LEFT_BTN_RELEASE);
-    };*/
-
-    const right_btn = document.getElementById("id_touchpad_right");
-    right_btn.addEventListener('click', function(evt){
-        //evt.preventDefault();
-        console.log("right down");
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        send_msg(RIGHT_CLICK);
-    });
-    /*right_btn.onmousedown = function(evt){
-        //evt.preventDefault();
-        console.log("right down");
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        send_msg(RIGHT_BTN_PRESS);
-    };
-
-    right_btn.onmouseup = function(evt){
-        //evt.preventDefault();
-        console.log("right up");
-        //const clientX = evt.touches[0].clientX - startX;
-        //const clientY = evt.touches[0].clientY - startY;
-        //console.log(clientX, clientY);
-        send_msg(RIGHT_BTN_RELEASE);
-    };*/
+// Event listener for right button click
+const right_btn = document.getElementById("id_touchpad_right");
+right_btn.addEventListener('click', function(evt){
+    console.log("right down");
+    send_msg(RIGHT_CLICK);
+});
 
 
 </script>

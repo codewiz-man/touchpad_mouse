@@ -81,74 +81,68 @@
 </head>
 <body id="id_body">
 
-<div class="C_container">
-    <div class="C_left"> 
-        <div class="C_config-container">
-            <div class="C_config-head">
-                Settings
+    <div class="C_container">
+        <div class="C_left"> 
+            <div class="C_config-container">
+                <div class="C_config-head">
+                    Settings
+                </div>
+                <!-- Input fields for server address and port -->
+                <div>
+                    <input type="text" placeholder="Server Address" id="id_server_address" disabled>
+                </div>
+                <div>
+                    <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
+                </div>
+                <!-- Button to save settings -->
+                <button class="C_button_large" id="id_save_setting"> save </button>
             </div>
-            <div>
-                <input type="text" placeholder="Server Address" id="id_server_address" disabled>
+        </div>
+        <div class="C_right">
+            <div> 
+                <!-- QR code image -->
+                <img class="C_qrcode" id="id_qrcode" src="qrcode.png">
             </div>
-            <div>
-                <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
-            </div>
-            <button class="C_button_large" id="id_save_setting"> save </button>
         </div>
     </div>
-    <div class="C_right">
-        <div> 
-            <img class="C_qrcode" id="id_qrcode" src="qrcode.png">
-        </div>
-    </div>
-</div>
-
-</body>
-<script>
-    /*var body = document.getElementById("id_body");
-    body.onload = function(){
-        pywebview.api.get_server_ip().then(function(res){
-            console.log(res);
-        });
-    };*/
-
-    window.addEventListener('pywebviewready', function() {
-        var server_ip = document.getElementById('id_server_address');
-        var server_port = document.getElementById('id_server_port');
-        pywebview.api.get_server_ip().then(function(res){
-            console.log(res);
-            server_ip.value = res[0];
-            server_port.value = res[1];
-        });
-
-        /*pywebview.api.get_server_qrcode().then(function(res) {
-            console.log(res);
-            var img = document.getElementById("id_qrcode");
-            img.src = 'data:image/png;base64,' + btoa(res);
-            document.body.appendChild(img);
-        });*/
-
+    
+    </body>
+    <script>
+        /* JavaScript code */
         
-        
-    })
+        // Event listener for when the webview is ready
+        window.addEventListener('pywebviewready', function() {
+            // Get references to server address and port input elements
+            var server_ip = document.getElementById('id_server_address');
+            var server_port = document.getElementById('id_server_port');
+            
+            // Call the Python API to get server IP and port
+            pywebview.api.get_server_ip().then(function(res){
+                console.log(res);
+                // Populate the input fields with retrieved values
+                server_ip.value = res[0];
+                server_port.value = res[1];
+            });
     
-
-    document.getElementById('id_save_setting').onclick = function(){
-        const port = document.getElementById("id_server_port").value;
-        if( (port == undefined) || (port == "" ) ){
-            alert("Enter Valid Server Port Number");
-            return;
-        }
-        pywebview.api.save_server_ip(port).then(function(res) {
-            if(res) {
-                alert("Saved Successfully.\nClose and Reopen the App to See the Changes");
-            } else {
-                alert("Settings Not Saved");
-            }
-            console.log(res);
-        });
-    };
-    
-    
-</script>
-</html>
+            // Event listener for saving settings button
+            document.getElementById('id_save_setting').onclick = function(){
+                // Get the server port value
+                const port = document.getElementById("id_server_port").value;
+                if( (port == undefined) || (port == "" ) ){
+                    alert("Enter Valid Server Port Number");
+                    return;
+                }
+                
+                // Call the Python API to save server IP and port
+                pywebview.api.save_server_ip(port).then(function(res) {
+                    if(res) {
+                        alert("Saved Successfully.\nClose and Reopen the App to See the Changes");
+                    } else {
+                        alert("Settings Not Saved");
+                    }
+                    console.log(res);
+                });
+            };
+        })
+    </script>
+    </html>
