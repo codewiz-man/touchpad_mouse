@@ -48,6 +48,17 @@ Before you begin, ensure you have met the following requirements:
 
 You can configure the server settings in the `config.json` file, including the server port and sensitivity.
 
+## Disclaimer
+
+**Note:** This application is currently under development and has not undergone extensive testing. It may be unstable and should be used with caution. Please report any issues you encounter, and consider contributing to its development.
+
+While we strive to maintain the quality and stability of this software, we cannot guarantee its performance in all environments or use cases. Use this application at your own risk.
+
+Your feedback and contributions are highly appreciated as they can help improve the reliability and functionality of this project.
+
+Thank you for your understanding.
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
