@@ -27,13 +27,13 @@ Before you begin, ensure you have met the following requirements:
 1. Clone this repository to your computer:
 
     ```bash
-    git clone https://github.com/codewiz-man/touchpad_js.git
+    git clone https://github.com/codewiz-man/touchpad_mouse.git
     ```
 
 2. Navigate to the project directory:
 
     ```bash
-    cd touchpad_js/server
+    cd touchpad_mouse/server
     ```
 
 3. Start the server:
