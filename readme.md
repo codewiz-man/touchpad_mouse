@@ -42,11 +42,11 @@ Before you begin, ensure you have met the following requirements:
     python websocket_server.py
     ```
 
-4. Open a web browser on your device and enter the server address and port (e.g., `http://192.168.0.1:2023`) to access the touchpad interface.
+4. Open 'client/index.html' in web browser on your mobile phone or install the 'client/app-debug.apk'
 
 ## Configuration
 
-You can configure the server settings in the `config.txt` file, including the server IP address and port.
+You can configure the server settings in the `config.json` file, including the server port and sensitivity.
 
 ## License
 
@@ -56,27 +56,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Thanks to the authors of the open-source libraries and packages used in this project.
 
-## Contributing
-
-Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
-
-1. Fork the project.
-2. Create your feature branch: `git checkout -b feature/your-feature-name`.
-3. Commit your changes: `git commit -m 'Add some feature'`.
-4. Push to the branch: `git push origin feature/your-feature-name`.
-5. Submit a pull request.
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
 ## Authors
 
-- Manjunath - [@codewiz-man](https://github.com/codewiz-man)
+- manjunath - [@codewiz-man](https://github.com/codewiz-man)
 
 ## Contact
 
 If you have any questions or want to report a bug, please open an issue on the [GitHub repository](https://github.com/codewiz-man/touchpad_js).
 
-## Acknowledgments
+## Dependencies
 
 This project uses icons sourced from Google Fonts Icons.
 
