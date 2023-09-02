@@ -131,6 +131,12 @@ def get_server_port():
     except Exception as e:
         print("file open error: {}".format(e))
         SERVER_PORT = "2023"
+        with open('config.json', 'w') as f:
+            fw = {}
+            fw["port"] = SERVER_PORT
+            fw["sensitivity"] = SENSITIVITY
+            json.dump(fw, f)
+            
     print(SERVER_PORT)
     print(SENSITIVITY)
 
