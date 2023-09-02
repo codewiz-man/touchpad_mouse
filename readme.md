@@ -73,7 +73,6 @@ This project uses the following Python packages:
 - [websockets](https://pypi.org/project/websockets/) version 11.0.3 (License: BSD-3-Clause)
 - [pynput](https://pypi.org/project/pynput/) version 1.7.6 (License: LGPLv3)
 - [pywebview](https://pypi.org/project/pywebview/) version 4.2.2 (License: BSD)
-- [qtpy](https://pypi.org/project/qtpy/) (License: MIT)
 - [qrcode](https://pypi.org/project/qrcode/) version 7.4.2 (License: BSD)
 
 
