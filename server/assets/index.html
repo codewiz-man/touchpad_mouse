@@ -92,9 +92,13 @@
                     <input type="text" placeholder="Server Address" id="id_server_address" disabled>
                 </div>
                 <div>
-                    <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
+                   <input type="text" placeholder="Server Port" id="id_server_port" value="2023">
                 </div>
-                <!-- Button to save settings -->
+                <div>
+                    <label for="id_sensitivity"> Sensitivity </label>
+                    <input id="id_sensitivity" type="range" value="1" min="0.6" max="3" step="0.2" >
+                    <span id="id_text_sensitivity"> </span>
+                </div>
                 <button class="C_button_large" id="id_save_setting"> save </button>
             </div>
         </div>
@@ -103,46 +107,72 @@
                 <!-- QR code image -->
                 <img class="C_qrcode" id="id_qrcode" src="qrcode.png">
             </div>
+            
+            
         </div>
     </div>
-    
-    </body>
-    <script>
-        /* JavaScript code */
+</div>
+
+</body>
+<script>
+    /*var body = document.getElementById("id_body");
+    body.onload = function(){
+        pywebview.api.get_server_ip().then(function(res){
+            console.log(res);
+        });
+    };*/
+
+    window.addEventListener('pywebviewready', function() {
+        var server_ip = document.getElementById('id_server_address');
+        var server_port = document.getElementById('id_server_port');
+        var sense = document.getElementById('id_sensitivity');
+        pywebview.api.get_server_ip().then(function(res){
+            console.log(res);
+            server_ip.value = res[0];
+            server_port.value = res[1];
+            sense.value = res[2];
+            document.getElementById('id_text_sensitivity').innerHTML = res[2];
+        });
+
+        /*pywebview.api.get_server_qrcode().then(function(res) {
+            console.log(res);
+            var img = document.getElementById("id_qrcode");
+            img.src = 'data:image/png;base64,' + btoa(res);
+            document.body.appendChild(img);
+        });*/
+
         
-        // Event listener for when the webview is ready
-        window.addEventListener('pywebviewready', function() {
-            // Get references to server address and port input elements
-            var server_ip = document.getElementById('id_server_address');
-            var server_port = document.getElementById('id_server_port');
-            
-            // Call the Python API to get server IP and port
-            pywebview.api.get_server_ip().then(function(res){
-                console.log(res);
-                // Populate the input fields with retrieved values
-                server_ip.value = res[0];
-                server_port.value = res[1];
-            });
+        
+    });
+
+    const sens = document.getElementById('id_sensitivity');
+    sens.oninput = function(){
+
+        document.getElementById("id_text_sensitivity").innerHTML = sens.value;
+
+    };
     
-            // Event listener for saving settings button
-            document.getElementById('id_save_setting').onclick = function(){
-                // Get the server port value
-                const port = document.getElementById("id_server_port").value;
-                if( (port == undefined) || (port == "" ) ){
-                    alert("Enter Valid Server Port Number");
-                    return;
-                }
-                
-                // Call the Python API to save server IP and port
-                pywebview.api.save_server_ip(port).then(function(res) {
-                    if(res) {
-                        alert("Saved Successfully.\nClose and Reopen the App to See the Changes");
-                    } else {
-                        alert("Settings Not Saved");
-                    }
-                    console.log(res);
-                });
-            };
-        })
-    </script>
-    </html>
+
+    document.getElementById('id_save_setting').onclick = function(){
+        const port = document.getElementById("id_server_port").value;
+        const sensitivity = document.getElementById("id_sensitivity").value;
+        if( (port == undefined) || (port == "" ) ){
+            alert("Enter Valid Server Port Number");
+            return;
+        }
+        pywebview.api.save_server_settings(port, sensitivity).then(function(res) {
+            console.log(res);
+            if(res) {
+                var sense = document.getElementById('id_sensitivity');
+                sense.value = sensitivity;
+                alert("Saved Successfully.\nClose and Reopen the App to See the Changes");
+            } else {
+                alert("Settings Not Saved");
+            }
+            console.log(res);
+        });
+    };
+    
+    
+</script>
+</html>

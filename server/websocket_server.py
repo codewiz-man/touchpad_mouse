@@ -6,11 +6,12 @@ from pynput.mouse import Button, Controller
 import webview
 import threading
 import qrcode
-import io
+import json
 
 SERVER_IP = ""
 SERVER_PORT = 2023
 SERVER_QRCODE = b""
+SENSITIVITY = 1
 
 TOUCHSTART = "00"
 TOUCHMOVE = "01"
@@ -49,8 +50,8 @@ async def echo(websocket):
         elif cmd == TOUCHMOVE:
             #x =  twos_complement( str(msg[1]), 8 )
             #y = twos_complement( str(msg[2]), 8 )
-            x = float(msg[1])
-            y = float(msg[2])
+            x = float(msg[1]) * SENSITIVITY
+            y = float(msg[2]) * SENSITIVITY
             print(x, y)
             mouse.move(x,y)
         elif cmd == LEFT_CLICK:
@@ -114,16 +115,24 @@ def open_confirmation_dialog(window):
         window.destroy()
     
 def get_server_port():
-    global SERVER_PORT
+    global SERVER_PORT, SENSITIVITY
     try:
-        with open('config.txt', 'r') as f:
+        '''with open('config.json', 'r') as f:
             fn = f.read()
             if( len(fn) < 1):
                 SERVER_PORT = "2023"
-            SERVER_PORT = fn
+            SERVER_PORT = fn'''
+        
+        with open('config.json', 'r') as f:
+            fn = json.load(f)
+            SERVER_PORT = fn["port"]
+            SENSITIVITY = float(fn["sensitivity"])
+
     except Exception as e:
         print("file open error: {}".format(e))
         SERVER_PORT = "2023"
+    print(SERVER_PORT)
+    print(SENSITIVITY)
 
 def get_qrcode_image():
     global SERVER_IP, SERVER_PORT, SERVER_QRCODE
@@ -145,17 +154,31 @@ class Api:
         pass
 
     def get_server_ip(self):
-        global SERVER_IP, SERVER_PORT
-        return [SERVER_IP, SERVER_PORT]
+        global SERVER_IP, SERVER_PORT, SENSITIVITY
+        return [SERVER_IP, SERVER_PORT, SENSITIVITY]
+    
 
-    def save_server_ip(self, ip):
-        print("PORT: {}".format(ip))
-        with open('config.txt', 'w') as f:
+    def save_server_settings(self, port, sensitivity):
+        global SERVER_PORT, SENSITIVITY
+        print("PORT: {}".format(port))
+        try:
+            fr = open('config.json', 'r')
+            fr = json.load(fr)
+        except FileNotFoundError:
+            fr = {}
+        
+        fr["port"] = port
+        fr["sensitivity"] = sensitivity
+        with open('config.json', 'w') as fw:
             try:
-                f.write(ip)
-                f.close()
+                #f.write(port)
+                #f.close()
+                json.dump(fr, fw)
+                SENSITIVITY = float(sensitivity)
+                SERVER_PORT = port
                 return True
             except Exception as e:
+                print(e)
                 return False
         #return False
     

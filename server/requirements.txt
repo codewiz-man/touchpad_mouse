@@ -1,5 +1,4 @@
 websockets==11.0.3
 pynput==1.7.6
 pywebview[qt]==4.2.2 
-qtpy
 qrcode==7.4.2
