@@ -152,7 +152,7 @@ def get_qrcode_image():
     #qr.print_ascii(out=f)
     #f.seek(0)
     img = qr.make_image()
-    img.save('assets/qrcode.png')
+    img.save('qrcode.png')
     #print(SERVER_QRCODE)
 
 class Api:
@@ -192,7 +192,7 @@ class Api:
         #global SERVER_QRCODE
         #return SERVER_QRCODE
         try:
-            with open('assets/qrcode.png', 'rb') as f:
+            with open('qrcode.png', 'rb') as f:
                 fs = f.read()
                 return fs.decode()
         except Exception as e:
@@ -209,8 +209,8 @@ def main():
     th.start()
 
     api = Api()
-    window = webview.create_window('Touchpad Server', 'assets/index.html', confirm_close=False, js_api=api)
-    webview.start(open_confirmation_dialog, window, debug=True)
+    window = webview.create_window('Touchpad Server', 'index.html', confirm_close=False, js_api=api)
+    webview.start(open_confirmation_dialog, window, debug=False)
     #webview.start(debug=True)
 
 main()
