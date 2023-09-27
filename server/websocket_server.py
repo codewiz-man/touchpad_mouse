@@ -212,10 +212,11 @@ def main():
     print( get_qrcode_image() )
 
     th = threading.Thread(target=start_server)
+    th.daemon = True
     th.start()
 
     api = Api()
-    window = webview.create_window('Touchpad Server', 'index.html', confirm_close=False, js_api=api)
+    window = webview.create_window('Touchpad Server', 'index.html', confirm_close=True, js_api=api)
     webview.start(open_confirmation_dialog, window, debug=False)
     #webview.start(debug=True)
 
