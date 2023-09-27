@@ -105,7 +105,7 @@
         <div class="C_right">
             <div> 
                 <!-- QR code image -->
-                <img class="C_qrcode" id="id_qrcode" src="qrcode.png">
+                <img class="C_qrcode" id="id_qrcode" src="">
             </div>
             
             
@@ -134,12 +134,14 @@
             document.getElementById('id_text_sensitivity').innerHTML = res[2];
         });
 
-        /*pywebview.api.get_server_qrcode().then(function(res) {
-            console.log(res);
+        pywebview.api.get_server_qrcode().then(function(res) {
+            //console.log(res);
             var img = document.getElementById("id_qrcode");
-            img.src = 'data:image/png;base64,' + btoa(res);
-            document.body.appendChild(img);
-        });*/
+            //console.log(img.src);
+            img.src = 'data:image/png;base64,' + res;
+            //console.log(img.src)
+            //document.body.appendChild(img);
+        });
 
         
         

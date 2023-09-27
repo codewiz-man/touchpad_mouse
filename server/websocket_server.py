@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.5
 
 import asyncio
+import base64
+import io
 from websockets.server import serve
 from pynput.mouse import Button, Controller
 import webview
@@ -148,11 +150,14 @@ def get_qrcode_image():
     #print(SERVER_QRCODE.text())
     qr = qrcode.QRCode()
     qr.add_data(val)
-    #f = io.StringIO()
-    #qr.print_ascii(out=f)
-    #f.seek(0)
     img = qr.make_image()
-    img.save('qrcode.png')
+
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    SERVER_QRCODE = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    #return img_str
+
+    #img.save('qrcode.png')
     #print(SERVER_QRCODE)
 
 class Api:
@@ -189,21 +194,22 @@ class Api:
         #return False
     
     def get_server_qrcode(self):
-        #global SERVER_QRCODE
-        #return SERVER_QRCODE
-        try:
+        global SERVER_QRCODE
+        return SERVER_QRCODE
+        '''try:
             with open('qrcode.png', 'rb') as f:
-                fs = f.read()
-                return fs.decode()
+                fs =  base64.b64encode( f.read() )
+                #print(fs.decode('utf-8'))
+                return fs.decode('utf-8')
         except Exception as e:
             print("open img err: {}".format(e))
             return ""
-
+        '''
 
 def main():
     get_local_ip()
     get_server_port()
-    get_qrcode_image()
+    print( get_qrcode_image() )
 
     th = threading.Thread(target=start_server)
     th.start()
