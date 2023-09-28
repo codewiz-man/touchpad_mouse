@@ -156,10 +156,10 @@ def get_qrcode_image():
     img = qr.make_image()
 
     buffered = io.BytesIO()
-    if platform.system() == "Windows":
-        img.save(buffered)
-    else:
-        img.save(buffered, format="PNG")
+    #if platform.system() == "Windows":
+    img.save(buffered)
+    #else:
+    #    img.save(buffered, format="PNG")
     SERVER_QRCODE = base64.b64encode(buffered.getvalue()).decode("utf-8")
     #return img_str
 
