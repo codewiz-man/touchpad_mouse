@@ -9,6 +9,9 @@ import webview
 import threading
 import qrcode
 import json
+import platform
+
+print(platform.system())
 
 SERVER_IP = ""
 SERVER_PORT = 2023
@@ -153,7 +156,10 @@ def get_qrcode_image():
     img = qr.make_image()
 
     buffered = io.BytesIO()
-    img.save(buffered, format="PNG")
+    if platform.system() == "Windows":
+        img.save(buffered)
+    else:
+        img.save(buffered, format="PNG")
     SERVER_QRCODE = base64.b64encode(buffered.getvalue()).decode("utf-8")
     #return img_str
 
