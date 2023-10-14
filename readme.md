@@ -3,7 +3,7 @@
 **Touchpad Mouse** is a Python/Web based application that turns your device into a wireless touchpad mouse. It allows you to control your computer's cursor remotely using your device's touchscreen. This project is useful for presentations, media playback control, and more. You can use your old android phone as touchpad.
 
 <p align="center">
-  <img width="300" height="300" src="https://github.com/codewiz-man/touchpad_mouse/assets/39612669/e0679aea-3a0d-4898-b3bf-05797506fd71">
+  <img width="240" height="320" src="https://github.com/codewiz-man/touchpad_mouse/assets/39612669/e0679aea-3a0d-4898-b3bf-05797506fd71">
 </p>
 
 
